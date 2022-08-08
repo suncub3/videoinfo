@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(test)
+project(sei)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -27,29 +27,28 @@ ELSEIF (CMAKE_SYSTEM_NAME MATCHES "Darwin")
     include_directories(third_party/glog/include)
     include_directories(third_party/gflags/include)
 
+    set(PROCESS x86_64)
     IF(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm")
-        message(STATUS "this is aarch64 cpu")
-        link_directories(third_party/ffmpeg/lib/aarch64)
-        link_directories(third_party/glog/lib/aarch64)
-        link_directories(third_party/x264/lib/aarch64)
+        message(STATUS "this is arm cpu")
+        set(PROCESS arm)
     ELSEIF(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
-        message(STATUS "this is x86 cpu")
-        link_directories(third_party/ffmpeg/lib/x86)
-        link_directories(third_party/glog/lib/x86)
-        link_directories(third_party/x264/lib/x86)
-    ENDIF(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64")
+        message(STATUS "this is x86_64 cpu")
+        set(PROCESS x86_64)
+    ENDIF(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "arm")
+
+    link_directories(third_party/ffmpeg/lib/${PROCESS})
+    link_directories(third_party/glog/lib/${PROCESS})
+    link_directories(third_party/x264/lib/${PROCESS})
 
     set(COMMON_LIB
             -lx264 -lz -lbz2 -liconv
             -lavformat -lavutil -lavcodec -lswresample -lavfilter -lswscale -lpostproc
             -lglog
-            #-lmp3lame -lopenjp2
-            #-lstdc++ -lpthread -lm -llzma
             )
 ENDIF (CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 aux_source_directory(src/add_sei ADD_SEI_SRC)
 aux_source_directory(src/read_sei READ_SEI_SRC)
 
-add_executable(test main.cpp ${ADD_SEI_SRC} ${READ_SEI_SRC})
-target_link_libraries(test ${COMMON_LIB})
+add_executable(sei main.cpp ${ADD_SEI_SRC} ${READ_SEI_SRC})
+target_link_libraries(sei ${COMMON_LIB})
